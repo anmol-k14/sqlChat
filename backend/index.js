@@ -47,6 +47,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the Mental Health API' });
+});
+
 app.use('/ai', aiRoutes);
 
 // Handle 404
