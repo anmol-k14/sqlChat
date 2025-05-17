@@ -17,28 +17,34 @@ export const db = await mysql.createConnection({
 
 const app = express();
 
+// Frontend URL - add your frontend URL here
+const allowedOrigins = [
+  'https://sql-chat-xbjv.vercel.app', 
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
+
+// Improved CORS configuration
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Temporarily allow all origins while testing
+      // When ready to lock down: callback(new Error('Not allowed by CORS'))
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true
+}));
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-// CORS configuration for Vercel deployment
-app.use(cors());
-
-// Explicitly set CORS headers for all routes
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
-  // Handle OPTIONS method
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-});
-
 
 // Routes
 app.use('/ai', aiRoutes);
