@@ -119,7 +119,7 @@ Create a `.env` file in the `backend` directory and add the necessary environmen
 ```
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=admin
+DB_PASSWORD=YOUR_PASSWORD
 DB_NAME=mentalhealth
 PORT=3000
 GOOGLE_AI_KEY=YOUR_API_KEY
