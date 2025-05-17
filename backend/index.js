@@ -7,36 +7,44 @@ import cors from 'cors';
 
 dotenv.config();
 
-
-export const db =await mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'admin',
-  database: 'mentalhealth'
+// Database connection using environment variables for deployment
+export const db = await mysql.createConnection({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'admin',
+  database: process.env.DB_NAME || 'mentalhealth'
 });
 
 const app = express();
 
+// Middleware
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-var corsOptions = {
-    origin: process.env.FRONTENDURL,
-    headers: ["Content-Type"],
-    //credentials: true 
-    methods: ['GET', 'POST', 'OPTIONS','PUT'],
 
-};
+// CORS configuration to allow requests from any origin
+app.use(cors({
+  origin: '*', // Allow any origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
+}));
 
-app.use(cors(corsOptions));
+// Routes
+app.use('/ai', aiRoutes);
 
+// Handle 404
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
 
-app.use('/ai',aiRoutes)
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
 
-const port=process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-
